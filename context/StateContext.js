@@ -16,7 +16,7 @@ export const StateContext = ({ children }) => {
     let index;
 
     const onRemove = (product) => {
-        foundProduct = cartItems.find((item) => item._id !== product._id)
+        foundProduct = cartItems.find((item) => item._id === product._id)
 
         setCartItems(cartItems.filter((item) => item._id !== foundProduct._id))
         setTotalPrice((prevTotalPrice) => prevTotalPrice - Number(foundProduct.price) * foundProduct.quantity)
@@ -61,13 +61,29 @@ export const StateContext = ({ children }) => {
         let newCartItems = cartItems.filter((item) => item._id !== id)
 
         if(value === 'inc') {
-            setCartItems([...newCartItems, {...foundProduct, quantity: foundProduct.quantity + 1}])
+            setCartItems(prevCartItems => {
+                const products = prevCartItems.map(product => {
+                  if (product._id === id) {
+                    return { ...product, quantity: product.quantity +1 };
+                  }
+                  return product;
+                });
+                return products
+            })
             setTotalPrice((prevTotalPrice) => prevTotalPrice + Number(foundProduct.price))
             setTotalQuantity((prevTotalQuantities) => prevTotalQuantities + 1)
 
         } else if(value === 'dec') {
             if(foundProduct.quantity > 1) {
-                setCartItems([...newCartItems, {...foundProduct, quantity: foundProduct.quantity - 1}])
+                setCartItems(prevCartItems => {
+                    const products = prevCartItems.map(product => {
+                      if (product._id === id) {
+                        return { ...product, quantity: product.quantity - 1 };
+                      }
+                      return product;
+                    });
+                    return products
+                })
                 setTotalPrice((prevTotalPrice) => prevTotalPrice - Number(foundProduct.price))
                 setTotalQuantity((prevTotalQuantities) => prevTotalQuantities - 1)
             }
